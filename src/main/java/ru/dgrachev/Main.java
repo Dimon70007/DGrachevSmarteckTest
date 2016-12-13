@@ -8,13 +8,14 @@ import java.util.List;
  */
 public class Main {
     //последовательно генерирует граф состояний (вариантов расцветки) и сохраняет их в список
-    //как вариант можно реализовать компаратор и закидывать в set чтобы при вращении не было повторений
+    //нашел ошибку... у меня генерируется только состояния для 255 элемента, а должно - для каждого
+    //как вариант можно реализовать компаратор или хэшкод и закидывать в set чтобы при вращении не было повторений
     //написал сам... в учебник не подсматривал. наверно в спокойной обстановке лучше думается
     public static void main(String[] args) {
         int xLength=3;
         int yLength=3;
-        int colorLimit=256;
-        INode<Integer[][]> node=new Node(null,xLength,yLength,colorLimit);
+        int colorLimit=2;
+        INode<Integer[][]> node=new Node(xLength,yLength,colorLimit);
         List<INode<Integer[][]>> nodesList=new ArrayList<>();
         while(node!=null){
             nodesList.add(node);
