@@ -9,7 +9,7 @@ import java.util.Set;
  */
 public class StatesCreater {
     public static void main(String[] args) {
-
+// смешно что падает не по StackOverFlow а - OutOfMemoryError
         Node root=createStates(3,3,2);
         Set<Node> normalizeNodeSet=GraphHelper.selectNode(root,new HashSet<>());
 //        for (Node node :
