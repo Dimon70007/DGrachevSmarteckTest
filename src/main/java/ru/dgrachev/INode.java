@@ -5,6 +5,7 @@ package ru.dgrachev;
  */
 public interface INode<T extends Object> {
 
+
     INode<T> getNextNode();
     INode<T> getPreviousNode();
     T getState();
