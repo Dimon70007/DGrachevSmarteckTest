@@ -1,6 +1,8 @@
 package ru.dgrachev.state_builder;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by OTBA}|{HbIu` on 15.12.16.
@@ -9,7 +11,11 @@ public class StatesCreater {
     public static void main(String[] args) {
 
         Node root=createStates(3,3,2);
-        GraphHelper.printNodesCount(root,0);
+        Set<Node> normalizeNodeSet=GraphHelper.selectNode(root,new HashSet<>());
+        for (Node node :
+                normalizeNodeSet) {
+            System.out.println(node);
+        }
 
     }
 

@@ -1,5 +1,6 @@
 package ru.dgrachev.state_builder;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +26,7 @@ public class Node {
         this.state = state;
     }
 
-    public Set<Node> getNextStates() {
+    public Set<Node> getNextNodes() {
         return nextStates;
     }
 
@@ -35,5 +36,26 @@ public class Node {
 
     public int[][] getState() {
         return state;
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.deepToString(state);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Node node = (Node) o;
+
+        return Arrays.deepEquals(state, node.state);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(state);
     }
 }
