@@ -9,6 +9,7 @@ public class StatesCreater {
     public static void main(String[] args) {
 
         Node root=createStates(3,3,2);
+        GraphHelper.printNodesCount(root,0);
 
     }
 

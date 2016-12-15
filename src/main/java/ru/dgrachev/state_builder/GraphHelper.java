@@ -5,4 +5,13 @@ package ru.dgrachev.state_builder;
  */
 public class GraphHelper {
 
+    public static int printNodesCount(Node root,int acc) {
+
+        for (Node node: root.getNextStates()){
+            acc+=printNodesCount(node,acc+1);
+        }
+            System.out.println(acc);
+        return acc;
+
+    }
 }
