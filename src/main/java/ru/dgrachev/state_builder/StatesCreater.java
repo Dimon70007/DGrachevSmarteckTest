@@ -12,10 +12,11 @@ public class StatesCreater {
 
         Node root=createStates(3,3,2);
         Set<Node> normalizeNodeSet=GraphHelper.selectNode(root,new HashSet<>());
-        for (Node node :
-                normalizeNodeSet) {
-            System.out.println(node);
-        }
+//        for (Node node :
+//                normalizeNodeSet) {
+//            System.out.println(node);
+//        }
+        System.out.println(normalizeNodeSet.size());
 
     }
 
