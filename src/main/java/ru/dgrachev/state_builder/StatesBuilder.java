@@ -9,13 +9,14 @@ import java.util.Set;
  */
 public class StatesBuilder {
     private final int colorsCount;
+    private final Set<Node> nodes;
 
     /**
      * @param colorsCount-количество цветов, необходимое для генерации
      */
     public StatesBuilder(int colorsCount) {
         this.colorsCount = colorsCount;
-
+        nodes = new HashSet<>();
     }
 
     /**
@@ -24,14 +25,19 @@ public class StatesBuilder {
      * @param node- текущая нода
      * @return множество node,содержащих множество node, содержащих множество...
      */
-    public Node build(final Node node){
+    public Set<Node> build(final Node node){
         int[][] state=node.getState();
-        node.addNodes(getIncrementStates(state));
-
-        for (Node n:node.getNextNodes()){
+        Set<Node> tmp=getIncrementStates(state);
+        //удаляем состояния, которые уже обработали
+        tmp.removeAll(nodes);
+        //добавляем те состояния, которых еще нету
+        nodes.addAll(tmp);
+        //пробегаемся только по отсутствующим в множестве состояниям
+        for (Node n:tmp){
             build(n);
         }
-        return node;
+        nodes.add(node);
+        return nodes;
     }
 
     /**

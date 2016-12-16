@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * Created by OTBA}|{HbIu` on 15.12.16.
  */
-public class Node {
+public class Node{
     private final Set<Node> nextStates;
     private final int[][] state;
 
@@ -73,4 +73,5 @@ public class Node {
         }
         return acc;
     }
+
 }
