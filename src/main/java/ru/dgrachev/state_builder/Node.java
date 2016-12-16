@@ -30,7 +30,7 @@ public class Node {
         return nextStates;
     }
 
-    public boolean setNodes(Set<Node> nodes){
+    public boolean addNodes(Set<Node> nodes){
         return nextStates.addAll(nodes);
     }
 
@@ -57,5 +57,20 @@ public class Node {
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(state);
+    }
+
+    public void print(){
+        for (Node n:nextStates){
+            n.print();
+        }
+        System.out.println(toString());
+    }
+
+    public int getCount(int acc){
+        acc++;
+        for (Node n:nextStates){
+            acc+=n.getCount(acc);
+        }
+        return acc;
     }
 }

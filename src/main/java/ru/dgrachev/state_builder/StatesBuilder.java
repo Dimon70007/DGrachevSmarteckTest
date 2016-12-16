@@ -9,66 +9,57 @@ import java.util.Set;
  */
 public class StatesBuilder {
     private final int colorsCount;
-//    String delimeter="";
 
     /**
      * @param colorsCount-количество цветов, необходимое для генерации
      */
     public StatesBuilder(int colorsCount) {
         this.colorsCount = colorsCount;
+
     }
 
     /**
-     *пробегаемся по всем ячейкам массива, создаем варианты массивов с ячейкой, увеличенной на 1
-     * от входного массива и каждую новую итерацию добавляем ноду с новым состоянием, рекурсивно вызывая
-     * метод build для построения новых вариантов состояний, зависящих от передаваемого
-     * есть еще желание заменить тройной for на что-то рекурсивное, однако боюсь усложнять читаемость кода
-     * @param state - текущее состояние node-иконка
-     * @param node - объект, обладающий состоянием и множеством разновидностей состояний
+     * генерим множество нод, следующих для текущей ноды, и запихиваем их в ноду,
+     * потом для каждой ноды рекурсивно вызываем build
+     * @param node- текущая нода
      * @return множество node,содержащих множество node, содержащих множество...
      */
-    public Set<Node> build(final int[][] state, final Node node){
-        Set<Node> result=new HashSet<>();
-        //добавил на всякий случай... в реальности мы не должны вызвать
-        if (state==null)
-            return result;
+    public Node build(final Node node){
+        int[][] state=node.getState();
+        node.addNodes(getIncrementStates(state));
 
-        for (int y = 0; y < state.length; y++) {
-            for (int x = 0; x < state[y].length; x++) {
-                int[][] nextState=incrementState(x,y,state);
-
-//                if (nextState!=null)
-//                    System.out.println(Arrays.deepToString(nextState));
-//                delimeter+="      ";
-                //после цепочки рекурсивных вызовов на нулевом шаге
-                // - получим цепочку вызовов, отличающихся на 1 в интервале от [0:colorsCount)
-                // и провалимся на следующую итерацию, не вернув при этом результат...
-                //есть вероятность что при большом colorsCount и длине state - закончится память или стек)))
-                if (nextState!=null)
-                    result.add(new Node(build(nextState,node),nextState));
-//                delimeter="";
-            }
+        for (Node n:node.getNextNodes()){
+            build(n);
         }
-        return result;
+        return node;
     }
 
     /**
      *
-     * @param x -индех состояния по х
-     * @param y - индекс состояния по у
-     * @param state - текущее состояние
-     * @return состояние (массив), отличающееся от текущего элементом state[x][y], увеличенным на 1
-     *  если дальнейшее увеличение текущего элемента >=colorsCount
+     * @param currentState - текущее состояние (массив), от которого генерируется множество состояний, отличающихся только
+     * одним элементом на 1
+     * @return множество состояний (массивов), если дальнейшее увеличение текущего
+     * элемента >=colorsCount - возвращается пустое множество (не null)
      */
-    private int[][] incrementState(int x, int y, int[][] state) {
-        int[][] nextState = new int[state.length][];
-        for (int i = 0; i < state.length; i++) {
-            nextState[i] = Arrays.copyOf(state[i], state[i].length);
+    private Set<Node> getIncrementStates(int[][] currentState){
+        Set<Node> incrementedStates=new HashSet<>();
+        for (int x = 0; x < currentState.length; x++) {
+            for (int y = 0; y < currentState[x].length; y++) {
+                if (currentState[x][y] < colorsCount - 1) {
+                    currentState[x][y]++;
+                    incrementedStates.add(new Node(arayDeepCopy(currentState)));
+                    currentState[x][y]--;
+                }
+            }
         }
-        if (nextState[x][y] < colorsCount-1) {
-            nextState[x][y]++;
-            return nextState;
+        return incrementedStates;
+    }
+
+    private int[][] arayDeepCopy(int[][] sourceAr){
+        int [][] targetArr=new int[sourceAr.length][];
+        for (int i = 0; i < sourceAr.length; i++) {
+            targetArr[i]= Arrays.copyOf(sourceAr[i],sourceAr[i].length);
         }
-        return null;
+        return targetArr;
     }
 }

@@ -10,13 +10,21 @@ import java.util.Set;
 public class StatesCreater {
     public static void main(String[] args) {
 // смешно что падает не по StackOverFlow а - OutOfMemoryError
-        Node root=createStates(3,3,2);
-        Set<Node> normalizeNodeSet=GraphHelper.selectNode(root,new HashSet<>());
+        Node root=createStates(3,3,3);
+//        root.print();
+        System.out.println(root.getCount(1));
+        Set<Node> allNodes=GraphHelper.selectNode(root,new HashSet<>());
+        System.out.println(allNodes.size());
+//        int count=GraphHelper.printNodesCount(root,1);
+//        System.out.println(count);
 //        for (Node node :
 //                normalizeNodeSet) {
 //            System.out.println(node);
 //        }
-        System.out.println(normalizeNodeSet.size());
+//        for (Node n:allNodes){
+//            System.out.println(n);
+//        }
+//        System.out.println(allNodes.size());
 
     }
 
@@ -27,8 +35,6 @@ public class StatesCreater {
             Arrays.fill(beginState[i],0);
         }
         StatesBuilder statesBuilder=new StatesBuilder(colors);
-        Node node=new Node(beginState);
-        node.setNodes(statesBuilder.build(node.getState(),node));
-        return node;
+        return statesBuilder.build(new Node(beginState));
     }
 }
