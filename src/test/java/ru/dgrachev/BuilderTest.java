@@ -7,6 +7,9 @@ import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
+import static org.junit.Assert.assertTrue;
+import static ru.dgrachev.NodeTest.*;
+import static ru.dgrachev.NodeHelper.*;
 import static ru.dgrachev.Params.*;
 
 /**
@@ -14,57 +17,67 @@ import static ru.dgrachev.Params.*;
  */
 public class BuilderTest {
 
+    Set<Node> allChildren;
+    Node rootNode;
+    int expectedSize;
     @Before
     public void setUp() throws Exception {
-
+        int[][] zeroArr=zeroArrCreator(X_LENGTH,Y_LENGTH);
+        rootNode=new Node(zeroArr,COLORS);
+        Builder builder=new Builder(rootNode,5);
+        builder.compute();
+        allChildren=new HashSet<>();
+        allChildren.addAll(treeToCollection(rootNode));
+        expectedSize=(int)Math.pow(COLORS,X_LENGTH*Y_LENGTH);
     }
 
     @Test
-    public void compute() throws Exception {
-
+    public void computeTest() throws Exception {
+        int actualSize=allChildren.size();
+        assertTrue(actualSize==expectedSize);
     }
 
 
-    private static int testNG(){
+    @Test
+    public void computeParallelTest() throws Exception {
+
+        assertTrue(testNG(10)==10);
+    }
+
+    private int testNG(final int countOfRightResult){
         Node rootNode= taskStarter();
 
         int countOfRightResults=1;
-        final int expectedSize=(int)Math.pow(colors, xLength * yLength);
-//        while (listNodes.size()==expectedSize) {
-        int nodesCount=0;
-        Collection<Node> listNodes=NodeHelper.treeToSet(rootNode);
-        Set<Node> uniqNodes=new HashSet<>();
-//        uniqNodes.addAll(listNodes);// убрал чтоб лишний проход не делать
-        for (Node node : listNodes
-                ) {
-            uniqNodes.add(node);//а тут добавил
-            nodesCount++;
+        Collection<Node> listNodes=NodeHelper.treeToCollection(rootNode);
+        while (listNodes.size()==expectedSize) {
+            Set<Node> uniqNodes=new HashSet<>();
+            uniqNodes.addAll(listNodes);
+            assertTrue(uniqNodes.size()==expectedSize);
+
+//            System.out.println(Arrays.asList("listNodes.size()="
+//            ,nodesCount," expectedSize=",(expectedSize)
+//            ," uniqNodes.size()="
+//            ,uniqNodes.size()).toString());
+            rootNode=taskStarter();
+            listNodes=NodeHelper.treeToCollection(rootNode);
+            countOfRightResults++;
+            if (countOfRightResults==countOfRightResult)
+                break;
+
         }
-//            System.out.println("count of right results="+countOfRightResults);
-
-        System.out.println(Arrays.asList("listNodes.size()=",nodesCount," expectedSize=",(expectedSize) ," uniqNodes.size()=" ,uniqNodes.size()).toString());
-//            listNodes=taskStarter();
-//
-//            countOfRightResults++;
-//            if (countOfRightResults>10)
-//                break;
-//
-//        }
-        assert(expectedSize==nodesCount);
-        Iterator<Node> iterator=listNodes.iterator();
-        try {
-            for (int i = 0; i < statesCount; i++) {
-                int [][] tmp=iterator.next().get2DArr(xLength);
-                System.out.println(Arrays.deepToString(tmp));
-            }
-        }catch (NoSuchElementException e){}
-
+//        Iterator<Node> iterator=listNodes.iterator();
+//        try {
+//            for (int i = 0; i < statesCount; i++) {
+//                int [][] tmp=iterator.next().get2DArr(xLength);
+//                System.out.println(Arrays.deepToString(tmp));
+//            }
+//        }catch (NoSuchElementException e){}
         return countOfRightResults;
     }
 
-    static Node taskStarter(){
+     Node taskStarter(){
         final ForkJoinPool pool=new ForkJoinPool();
-        final Node rootNode=new Node(arrCreator(xLength, yLength), colors);
+        final Node rootNode=new Node(zeroArrCreator(xLength, yLength), colors);
         final Builder builder=new Builder(
                 rootNode
                 , 0
@@ -73,15 +86,7 @@ public class BuilderTest {
         pool.submit(rootTask);
         final Node rootNode2=rootTask.join();
 //        System.out.println("tree of States has been build");
-        assert(rootNode.equals(rootNode2));
+        assertTrue(rootNode.equals(rootNode2));
         return rootNode2;
-    }
-
-    static int [][] arrCreator(final int xLength, final int yLength){
-        int[][] result=new int[xLength][yLength];
-        for (int i = 0; i < xLength; i++) {
-            Arrays.fill(result[i],0);
-        }
-        return result;
     }
 }
