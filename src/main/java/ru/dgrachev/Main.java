@@ -1,78 +1,95 @@
 package ru.dgrachev;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static ru.dgrachev.Params.*;
 
 /**
  * Created by OTBA}|{HbIu` on 09.02.17.
  */
 public class Main {
     //задание:
-    //сгенерировать все возможные массивы указанного размера (X_LENGTH,Y_LENGTH)с указанным количеством
-    //состояний (COLORS) для каждой ячейки массива
-    private static final int X_LENGTH=3;
-    private static final int Y_LENGTH=3;
-    private static final int COLORS=4;
+    //сгенерировать все возможные массивы указанного размера (xLength,yLength)с указанным количеством
+    //состояний (colors) для каждой ячейки массива
+
 
 
 
     public static void main(String... args) throws Exception {
-        final int countOfLaunch=10;
-        double averageCountOfResults=0;
-//        for (int i = 0; i < countOfLaunch; i++) {
-            averageCountOfResults+=testNG();
-//            System.out.println("averageCountOfResults="+averageCountOfResults);
-//        }
-//        averageCountOfResults=averageCountOfResults/countOfLaunch;
-//        System.out.println("averageCountOfResults="+averageCountOfResults);
-//         приблизительно в 20% случаях программа дает неправильный результат -
-//        это следствие того что CopyOnWriteArraySet не дает 100% гарантию,
-//         что не будет дублей при частой записи с нескольких потоков
-//        у меня решается дополнительным однопоточным прогоном через HashSet
-//        вместо этого можно было бы выбрать ConcurrentHashMap и методы типа putIfAbscent
+        loadProperties();
+        Set<Node> nodes= resultAnaliser();
     }
 
-    private static int testNG(){
-        Node rootNode=testStarter();
 
-        int countOfRightResults=1;
-        final int expectedSize=(int)Math.pow(COLORS,X_LENGTH*Y_LENGTH);
-//        while (listNodes.size()==expectedSize) {
-        int nodesCount=0;
-        Collection<Node> listNodes=NodeHelper.treeToSet(rootNode);
-        Set<Node> uniqNodes=new HashSet<>();
-//        uniqNodes.addAll(listNodes);// убрал чтоб лишний проход не делать
-        for (Node node : listNodes
-             ) {
-            uniqNodes.add(node);//а тут добавил
-            nodesCount++;
+    private static void loadProperties() {
+
+        // create and load default params
+        String propsFileName="params.xml";
+        Properties defaultProps = new Properties();
+        defaultProps.setProperty("colors",Integer.toString(DEFAULT_COLORS));
+        defaultProps.setProperty("xLength",Integer.toString(DEFAULT_X_LENGTH));
+        defaultProps.setProperty("yLength",Integer.toString(DEFAULT_Y_LENGTH));
+        defaultProps.setProperty("statesCount",Integer.toString(DEFAULT_STATES_COUNT));
+        FileInputStream in = null;
+        Properties params = new Properties(defaultProps);
+        // now load params
+        // from last invocation
+        try{
+            in = new FileInputStream(propsFileName);
+            params.load(in);
+            in.close();
+        } catch (FileNotFoundException e) {
+            //if file does not exist, create it in current directory
+            try {
+                Path path = Paths.get(new File(".").getPath(), propsFileName);
+                BufferedWriter bw=Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+                defaultProps.store(bw, "---No Comment---");
+                bw.close();
+            } catch (IOException e1) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e1);
+            }
+        } catch (IOException  e) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
         }
-            System.out.println("count of right results="+countOfRightResults);
+        xLength =Integer.valueOf(params.getProperty("xLength"));
+        yLength =Integer.valueOf(params.getProperty("yLength"));
+        colors =Integer.valueOf(params.getProperty("colors"));
+        statesCount =Integer.valueOf(params.getProperty("statesCount"));
 
-        System.out.println(Arrays.asList("listNodes.size()=",nodesCount," expectedSize=",(expectedSize) ," uniqNodes.size()=" ,uniqNodes.size()).toString());
-//            listNodes=testStarter();
-//
-//            countOfRightResults++;
-//            if (countOfRightResults>10)
-//                break;
-//
-//        }
-        assert(expectedSize==nodesCount);
+    }
+
+    private static Set<Node> resultAnaliser(){
+        Node rootNode= taskStarter();
+        final int expectedSize=(int)Math.pow(colors, xLength * yLength);
+        Collection<Node> listNodes=NodeHelper.treeToSet(rootNode);
+        Set<Node> uniqueNodes=new HashSet<>();
+        uniqueNodes.addAll(listNodes);
+        System.out.println(Arrays.asList(   "listNodes.size()=",listNodes.size()
+                                            ," expectedSize=",(expectedSize)
+                                            ," uniqueNodes.size()=" ,uniqueNodes.size()
+                                        ).toString().replace(",",""));
         Iterator<Node> iterator=listNodes.iterator();
         try {
-
-            for (int i = 0; i < 20; i++) {
-                int [][] tmp=iterator.next().get2DArr(X_LENGTH);
+            for (int i = 0; i < statesCount; i++) {
+                int [][] tmp=iterator.next().get2DArr(xLength);
                 System.out.println(Arrays.deepToString(tmp));
             }
         }catch (NoSuchElementException e){}
-        return countOfRightResults;
+        return uniqueNodes;
     }
 
-    public static Node testStarter(){
+    static Node taskStarter(){
         final ForkJoinPool pool=new ForkJoinPool();
-        final Node rootNode=new Node(arrCreator(X_LENGTH,Y_LENGTH),COLORS);
+        final Node rootNode=new Node(arrCreator(xLength, yLength), colors);
         final Builder builder=new Builder(
                 rootNode
                 , 0
@@ -80,16 +97,12 @@ public class Main {
         final ForkJoinTask<Node> rootTask=builder.fork();
         pool.submit(rootTask);
         final Node rootNode2=rootTask.join();
-        System.out.println("phase1 ends");
+//        System.out.println("tree of States has been build");
         assert(rootNode.equals(rootNode2));
-//
-//        final Set<Node> nodes=new HashSet<>();
-//        nodes.addAll(NodeHelper.treeToSet(rootNode));
-//        System.out.println("phase2 ends");
         return rootNode2;
     }
 
-    public static int [][] arrCreator(final int xLength, final int yLength){
+    static int [][] arrCreator(final int xLength, final int yLength){
         int[][] result=new int[xLength][yLength];
         for (int i = 0; i < xLength; i++) {
             Arrays.fill(result[i],0);
