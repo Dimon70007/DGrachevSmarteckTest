@@ -20,6 +20,7 @@ public class NodeTest {
     final static int X_LENGTH =3;
     final static int Y_LENGTH =3;
     final static int COLORS =3;
+    final static int STATES_COUNT=20;
 
     @Before
     public void setUp() throws Exception {

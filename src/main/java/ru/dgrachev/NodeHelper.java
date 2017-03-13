@@ -1,10 +1,7 @@
 package ru.dgrachev;
 
 import java.awt.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
+import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
@@ -19,15 +16,22 @@ public class NodeHelper {
     }
 
     public static int[] convertMatrixToVector(final int [][] arr) {
-        final int sizeX =arr.length;
-        final int sizeY =arr[sizeX-1].length;
+        final int sizeY =arr.length;
+        final int sizeX =arr[0].length;
         int[] result=new int[sizeY*sizeX];
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
-                result[NodeHelper.convert2DTo1D(
-                        new Point(x,y),sizeX)]
-                        =arr[x][y];
+                int coordinate=convert2DTo1D(new Point(x,y),sizeX);
+                result[coordinate]=arr[y][x];
             }
+        }
+        return result;
+    }
+
+    static int [][] zeroArrCreator(final int xLength, final int yLength){
+        int[][] result=new int[xLength][yLength];
+        for (int i = 0; i < xLength; i++) {
+            Arrays.fill(result[i],0);
         }
         return result;
     }
@@ -40,7 +44,7 @@ public class NodeHelper {
         return result;
     }
 
-    public static Collection<Node> treeToSet(final Node rootNode){
+    public static Collection<Node> treeToCollection(final Node rootNode){
         ForkJoinPool helperPool=new ForkJoinPool();
         final TreeToSetHelper helper=new TreeToSetHelper(rootNode,0);
         final ForkJoinTask<Collection<Node>> helperTask=helper.fork();

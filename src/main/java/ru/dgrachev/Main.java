@@ -26,7 +26,8 @@ public class Main {
 
     public static void main(String... args) throws Exception {
         loadProperties();
-        Set<Node> nodes= resultAnaliser();
+        Collection<Node> nodes= resultAnaliser();
+        //// TODO: 12.03.17
     }
 
 
@@ -67,16 +68,16 @@ public class Main {
 
     }
 
-    private static Set<Node> resultAnaliser(){
+    private static Collection<Node> resultAnaliser(){
         Node rootNode= taskStarter();
-        final int expectedSize=(int)Math.pow(colors, xLength * yLength);
-        Collection<Node> listNodes=NodeHelper.treeToSet(rootNode);
-        Set<Node> uniqueNodes=new HashSet<>();
-        uniqueNodes.addAll(listNodes);
-        System.out.println(Arrays.asList(   "listNodes.size()=",listNodes.size()
-                                            ," expectedSize=",(expectedSize)
-                                            ," uniqueNodes.size()=" ,uniqueNodes.size()
-                                        ).toString().replace(",",""));
+//        final int expectedSize=(int)Math.pow(colors, xLength * yLength);
+        Collection<Node> listNodes=NodeHelper.treeToCollection(rootNode);
+//        Set<Node> uniqueNodes=new HashSet<>();
+//        uniqueNodes.addAll(listNodes);
+//        System.out.println(Arrays.asList(   "listNodes.size()=",listNodes.size()
+//                                            ," expectedSize=",(expectedSize)
+//                                            ," uniqueNodes.size()=" ,uniqueNodes.size()
+//                                        ).toString().replace(",",""));
         Iterator<Node> iterator=listNodes.iterator();
         try {
             for (int i = 0; i < statesCount; i++) {
@@ -84,12 +85,12 @@ public class Main {
                 System.out.println(Arrays.deepToString(tmp));
             }
         }catch (NoSuchElementException e){}
-        return uniqueNodes;
+        return listNodes;//uniqueNodes;
     }
 
     static Node taskStarter(){
         final ForkJoinPool pool=new ForkJoinPool();
-        final Node rootNode=new Node(arrCreator(xLength, yLength), colors);
+        final Node rootNode=new Node(NodeHelper.zeroArrCreator(xLength, yLength), colors);
         final Builder builder=new Builder(
                 rootNode
                 , 0
@@ -102,12 +103,5 @@ public class Main {
         return rootNode2;
     }
 
-    static int [][] arrCreator(final int xLength, final int yLength){
-        int[][] result=new int[xLength][yLength];
-        for (int i = 0; i < xLength; i++) {
-            Arrays.fill(result[i],0);
-        }
-        return result;
-    }
 
 }
