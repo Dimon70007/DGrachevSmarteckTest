@@ -90,7 +90,7 @@ public class NodeTest {
                 {0,0,0},
                 {0,0,0}
         };
-        int [][] actual=rootNode.get2DArr(X_LENGTH);
+        int [][] actual=rootNode.get2DArr();
         assertTrue(Arrays.deepEquals(actual,expected));
     }
 

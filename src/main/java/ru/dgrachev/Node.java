@@ -13,17 +13,20 @@ public class Node {//implements Iterable<Node>{
     private final Collection<Node> children;
     private final Node parentNode;
     private final int arrLength;
+    private final int xSize;
 
     public Node(final Node parentNode
             , final int[] arr
             , final int colorsCount
             , final int coordinate) {
-        this.parentNode=parentNode;
-        this.arr=arr;
-        this.colorsCount=colorsCount;
-        this.coordinate=coordinate;
-        this.children=new ArrayList<>();
+        this.parentNode = parentNode;
+        this.arr = arr;
+        this.colorsCount = colorsCount;
+        this.coordinate = coordinate;
+        this.children = new ArrayList<>();
         arrLength = this.arr.length;
+        xSize = parentNode.getXSize();
+
     }
 
     public Node(final int[][] arr, final int colorsCount) {
@@ -34,6 +37,7 @@ public class Node {//implements Iterable<Node>{
         this.parentNode=null;
         this.children=new ArrayList<>();
         this.arrLength = this.arr.length;
+        xSize = arr[0].length;
     }
 
     public int getCoordinate() {
@@ -83,8 +87,8 @@ public class Node {//implements Iterable<Node>{
         return arr;
     }
 
-    public int[][] get2DArr(final int sizeX) {
-        return NodeHelper.convertVetorToMatrix(arr,sizeX);
+    public int[][] get2DArr() {
+        return NodeHelper.convertVetorToMatrix(arr,xSize);
     }
 
     public boolean isFinal(){
@@ -107,7 +111,12 @@ public class Node {//implements Iterable<Node>{
         return Arrays.hashCode(arr);
     }
 
-    private Collection<Node> getNextNodes(final int currentColor,final int currentCoordinate,final Collection<Node> acc){
+    @Override
+    public String toString() {
+        return Arrays.deepToString(get2DArr());
+    }
+
+    private Collection<Node> getNextNodes(final int currentColor, final int currentCoordinate, final Collection<Node> acc){
         //если у нас нода с координатой ==arrLength у нее нечего генерить
         if (currentCoordinate==arrLength) {
 //            System.out.println();
@@ -127,6 +136,10 @@ public class Node {//implements Iterable<Node>{
         acc.add(nextNode);
 
         return getNextNodes(currentColor+1,currentCoordinate,acc);
+    }
+
+    public int getXSize() {
+        return xSize;
     }
 //
 //    @Override
