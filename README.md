@@ -1,5 +1,5 @@
 # DGrachevSmarteckTest
-This lib generates Collection of Matrix (cpecified xLength * yLength) and specified colors.
+This lib generates Collection of Matrixes (cpecified xLength * yLength) and specified colors.
 Fourth param is a stateCount to return.
 Interface:
 class MatrixGenerator:
@@ -9,7 +9,7 @@ class MatrixGenerator:
   args[2]-colors
   args[3]-stateCount
   
-  return Collection of generated Nodes include rootNode
+  return Collection of generated Nodes (that contains different matrix) include rootNode
   
   if args.length==0 generate will be calling with arguments in params.ini
   
